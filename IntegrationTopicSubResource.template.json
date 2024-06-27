@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "asb_namespace": {
+      "type": "string",
+      "metadata": {
+        "description": "Environment Number or Customer Number"
+      },
+      "defaultValue": "#{AsbNamespace}#"
+    },
+    "asb_topic_Subscription_names": {
+      "type": "array",
+      "metadata": {
+        "description":"Names of Topics to be created under Azure Service Bus"
+      },
+      "defaultValue": "#{AsbTopicNames}#"
+    }
+  },
+  "variables": {
+  "servicebusnamespace": "[parameters('asb_namespace')]",   
+    "resourcegrouplocation": "[resourceGroup().location]",
+    "authRuleResourceId": "[resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', variables('servicebusnamespace'), 'RootManageSharedAccessKey')]",
+    "sbVersion": "2017-04-01"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ServiceBus/namespaces/topics/subscriptions",
+      "apiVersion": "2017-04-01",
+      "name": "[concat(variables('servicebusnamespace'), '/',split(parameters('asb_topic_Subscription_names')[copyIndex()],':')[0],'/',split(parameters('asb_topic_Subscription_names')[copyIndex()],':')[1])]",
+      "location": "[variables('resourcegrouplocation')]",
+      "properties": {
+        "lockDuration": "PT5M",
+        "requiresSession": false,
+        "defaultMessageTimeToLive": "P14D",
+        "deadLetteringOnMessageExpiration": true,
+        "deadLetteringOnFilterEvaluationExceptions": false,
+        "maxDeliveryCount": 10,
+        "status": "Disabled",
+        "enableBatchedOperations": true,
+        "autoDeleteOnIdle": "P10675198DT2H48M5.477S"
+      }       
+      ,
+      "copy":{
+        "name":"StudentDataPublicationTopics",
+        "count":"[length(parameters('asb_topic_Subscription_names'))]"
+      }      
+    }   
+  ],
+  "outputs": {    
+    "SBNamespace": {
+      "type": "string",
+      "value": "[variables('servicebusnamespace')]"
+    },   
+    "SBKey": {
+      "type": "string",
+      "value": "[listkeys(variables('authRuleResourceId'), variables('sbVersion')).primarykey]"
+    }   
+  }
+}

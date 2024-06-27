@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "asb_namespace":{
+            "metadata": {
+                "description":"ASB NameSpace"
+            },
+            "value":"Ath-700015-dev-sb-01"
+        },
+         "asb_topic_Subscription_names":{
+            "metadata": {
+                "description":"Names of Topics:Subscription to be created under Azure Service Bus"
+            },
+            "value":["anth-gra-lea-sbt-01:anth-gra-lea-ext-sbts-01","anth-att-lea-sbt-01:anth-att-lea-ext-sbts-01","anth-ack-not-sbt-01:anth-ack-not-sbts-01"]
+         }
+       
+    }
+}
